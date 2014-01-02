@@ -9,6 +9,49 @@ let Promise =
 
 let bluetoothManager;
 
+/**
+ * Emulator helper.
+ */
+let emulator = (function() {
+  let pendingCmdCount = 0;
+  let originalRunEmulatorCmd = runEmulatorCmd;
+
+  // Overwritten it so people could not call this function directly.
+  runEmulatorCmd = function() {
+    throw "Use emulator.run(cmd, callback) instead of runEmulatorCmd";
+  };
+
+  function run(cmd, callback) {
+    pendingCmdCount++;
+    originalRunEmulatorCmd(cmd, function(result) {
+      pendingCmdCount--;
+      if (callback && typeof callback === "function") {
+        callback(result);
+      }
+    });
+  }
+
+  /**
+   * @return Promise
+   */
+  function waitFinish() {
+    let deferred = Promise.defer();
+
+    waitFor(function() {
+      deferred.resolve();
+    }, function() {
+      return pendingCmdCount === 0;
+    });
+
+    return deferred.promise;
+  }
+
+  return {
+    run: run,
+    waitFinish: waitFinish
+  };
+}());
+
 /* Get mozSettings value specified by @aKey.
  *
  * Resolve if that mozSettings value is retrieved successfully, reject
@@ -233,7 +276,11 @@ function cleanUp() {
     // Use ok here so that we have at least one test run.
     ok(true, "permissions flushed");
 
-    finish();
+    // Wait for the emulator command to complete process
+    emulator.waitFinish()
+      .then(function() {
+        finish();
+      });
   });
 }
 
