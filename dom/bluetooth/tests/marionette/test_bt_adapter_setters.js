@@ -75,12 +75,18 @@ startBluetoothTest(true, function testCaseMain(aAdapter) {
     is(aAdapter.name, "JaminSetBtName", "Set name failed.");
   });
 
+  // Send back the requested Passkey code when adapter tries to pair with a remote device.
+  //aAdapter.setPasskey(FAKE_BT_DEVICE, 123456); // passkey is 6-digit number
+  aAdapter.setPasskey(FAKE_BT_DEVICE, "1234"); // passkey is 6-digit number
+
+/*
   // Send back the pairing confirmation when adapter tries to pair with a remote device.
-  //aAdapter.setPairingConfirmation(deviceAddress, flag);
+  aAdapter.setPairingConfirmation(deviceAddress, flag);
 
   // Send back the requested Passkey code when adapter tries to pair with a remote device.
-  //aAdapter.setPasskey(deviceAddress, key); // passkey is 6-digit number
+  aAdapter.setPasskey(deviceAddress, key); // passkey is 6-digit number
 
   // Send back the requested PIN code when adapter tries to pair with a remote device.
-  //aAdapter.setPinCode(deviceAddress, code); // pinCode is a string, example: 0000
+  aAdapter.setPinCode(deviceAddress, code); // pinCode is a string, example: 0000
+*/
 });

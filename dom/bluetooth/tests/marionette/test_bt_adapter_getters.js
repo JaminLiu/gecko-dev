@@ -7,13 +7,14 @@ const EMULATOR_CLASS = 0x58020c;
 
 startBluetoothTest(true, function testCaseMain(aAdapter) {
   log("Checking adapter attributes ...");
-
-//  is(aAdapter.name, EMULATOR_NAME, "adapter.name");
-//  is(aAdapter.class, EMULATOR_CLASS, "adapter.class");
-//  is(aAdapter.address, EMULATOR_ADDRESS, "adapter.address");
-//  is(aAdapter.discovering, false, "adapter.discovering");
-//  is(aAdapter.discoverable, false, "adapter.discoverable");
-//  is(aAdapter.discoverableTimeout, 120, "adapter.discoverableTimeout");
+/*
+  is(aAdapter.name, EMULATOR_NAME, "adapter.name");
+  is(aAdapter.class, EMULATOR_CLASS, "adapter.class");
+  is(aAdapter.address, EMULATOR_ADDRESS, "adapter.address");
+  is(aAdapter.discovering, false, "adapter.discovering");
+  is(aAdapter.discoverable, false, "adapter.discoverable");
+  is(aAdapter.discoverableTimeout, 120, "adapter.discoverableTimeout");
+*/
 
   let name;
   let addr;
@@ -62,15 +63,16 @@ startBluetoothTest(true, function testCaseMain(aAdapter) {
   log("adapter discoverableTimeout: " + aAdapter.discoverableTimeout);
   log("adapter uuids: " + aAdapter.uuids);
 
-// TODO
-// aAdapter.address // done
-// aAdapter.class
-// aAdapter.devices
-// aAdapter.discoverable // done
-// aAdapter.discoverableTimeout
-// aAdapter.discovering // done
-// aAdapter.name // done
-// aAdapter.uuids
+/*
+aAdapter.address // done
+aAdapter.class
+aAdapter.devices
+aAdapter.discoverable // done
+aAdapter.discoverableTimeout
+aAdapter.discovering // done
+aAdapter.name // done
+aAdapter.uuids
+*/
 
   log("6. Jamin emulator OK");
   ok(true, "6. Jamin emulator OK");

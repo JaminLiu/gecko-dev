@@ -276,11 +276,11 @@ function cleanUp() {
     // Use ok here so that we have at least one test run.
     ok(true, "permissions flushed");
 
-    // Wait for the emulator command to complete process
-    emulator.waitFinish()
+    emulator.waitFinish()// jamin test
       .then(function() {
         finish();
       });
+    //jamin test// finish();
   });
 }
 

@@ -5,140 +5,168 @@ const EMULATOR_ADDRESS = "56:34:12:00:54:52";
 const EMULATOR_NAME = "Full Android on Emulator";
 const EMULATOR_CLASS = 0x58020c;
 
-const FAKE_BT_NAME = "JaminDevice";
 const FAKE_BT_ADDRESS = "56:34:12:00:54:60";
-const FAKE_BT_DEVICE = "\"56:34:12:00:54:60,JaminDevice\"";
+const FAKE_BT_NAME = "JaminDevice";
 
 let deviceNum = 0;
 let discoveryDeferred = Promise.defer();
 let TheDevice;
 let theAdapter;
 
-function onDeviceFound(evt) {
-  var device = evt.device;
-  deviceNum = deviceNum +1;
-
-TheDevice = device;
-
-//var devices = [device];
-theAdapter.devices = [device];
-
-  // How to verify? Need QEMU support.
-  log("3. Jamin display devices: " + device.name );
-  log("4. Jamin display address: " + device.address );
-
-  log("5. Jamin display class: " + device.class );
-  log("6. Jamin display connected: " + device.connected );
-
-  log("7. Jamin display icon: " + device.icon );
-  log("8. Jamin display paired: " + device.paired );
-
-  log("9. Jamin display services: " + device.services );
-  log("10. Jamin display uuids: " + device.uuids );
-
-  //log("5. Jamin display length: " + theAdapter.devices.length );
-  //log("5. Jamin display length: " + devices.length );
-
-  ok(true, "Device found");
-
-  discoveryDeferred.resolve();
-}
-
-function addFakeDevice() {
+// 1. Add Remote Device
+function addRemoteDevice() {
+  log("1. Add Remote Device    \t,");
   let deferred = Promise.defer();
-  log("Add a fake device.");
-  emulator.run("bt radd " + FAKE_BT_DEVICE, function(result) {
+
+  emulator.run("bt add-remote " + FAKE_BT_ADDRESS, function(result) {
     if (result.length > 0) {
-      log("addFakeDevice done");
-        deferred.resolve();
+      log("   1. Done    \t,");
+      deferred.resolve();
     } else {
-      log("Failed to add fake device.");
+      log("   1. Fail    \t,");
       deferred.reject();
     }
   });
   return deferred.promise;
 }
 
-function startDiscovery(aAdapter) {
+// 2. Set Remote Device
+function setRemoteDeviceName() {
+  log("2.Set Remote device.    \t,");
   let deferred = Promise.defer();
 
-  log("startDiscovery ~~");
+  emulator.run("bt set " + FAKE_BT_ADDRESS + " name " + FAKE_BT_NAME, function(result) {
+    if (result.length > 0) {
+      log("   2. Done    \t,");
+        deferred.resolve();
+    } else {
+      log("   2. Fail?    \t,");
+      deferred.resolve();
+      //deferred.reject();
+    }
+  });
+  return deferred.promise;
+}
+
+// 3. Start Discovery
+function startDiscovery(aAdapter) {
+  log("3. Start Discovery    \t,");
+  let deferred = Promise.defer();
 
   let request = aAdapter.startDiscovery();
   request.addEventListener("success", function() {
-    log("startDiscovery success");
+    log("   3. Done    \t,");
     deferred.resolve();
   });
   request.addEventListener("error", function() {
-    log("startDiscovery error");
+    log("   3. Fail    \t,");
     deferred.reject();
   });
 
   return deferred.promise;
 }
 
-function stopDiscovery(aAdapter) {
-  let deferred = Promise.defer();
+function onDeviceFound(evt) {
+  log("  4. onDeviceFound    \t,");
+  var device = evt.device;
+  deviceNum = deviceNum +1;
 
-  log("stopDiscovery ~~");
+  TheDevice = device;
 
-  let request = aAdapter.stopDiscovery();
-  request.addEventListener("success", function() {
-    log("stopDiscovery success");
-    deferred.resolve();
-  });
-  request.addEventListener("error", function() {
-    log("stopDiscovery error");
-    deferred.reject();
-  });
+  //var devices = [device];
+  theAdapter.devices = [device];
 
-  return deferred.promise;
+  // How to verify? Need QEMU support.
+  log("   4. Jamin display devices: " + device.name + "    \t,");
+  log("   4. Jamin display address: " + device.address + "    \t,");
+
+  //log("4. Jamin display class: " + device.class );
+  //log("4. Jamin display connected: " + device.connected );
+  //log("4. Jamin display icon: " + device.icon );
+  //log("4. Jamin display paired: " + device.paired );
+  //log("4. Jamin display services: " + device.services );
+  //log("4. Jamin display uuids: " + device.uuids );
+  //log("4. Jamin display length: " + theAdapter.devices.length );
+  //log("4. Jamin display length: " + devices.length );
+
+  ok(true, "Device found");
+  discoveryDeferred.resolve();
 }
 
+// 5. Pairing
 function pair(aAdapter, aDevice) {
+  log("5. Pairing    \t,");
   let deferred = Promise.defer();
-
-  log("pair ~~");
 
   let request = aAdapter.pair(aDevice);
   request.addEventListener("success", function() {
-    log("pair success");
+    log("   5. Done    \t,");
     deferred.resolve();
   });
   request.addEventListener("error", function() {
-    log("pair error");
+    log("   5. Fail    \t,");
     deferred.reject();
   });
 
+  return deferred.promise;
+}
+
+// 6. Stop discovery
+function stopDiscovery(aAdapter) {
+  log("6. Stop discovery    \t,");
+  let deferred = Promise.defer();
+
+  let request = aAdapter.stopDiscovery();
+  request.addEventListener("success", function() {
+    log("   6. Done    \t,");
+    deferred.resolve();
+  });
+  request.addEventListener("error", function() {
+    log("   6. Fail    \t,");
+    deferred.reject();
+  });
+
+  return deferred.promise;
+}
+
+// 7. Remove device
+function removeRemoteDevice() {
+  log("7. Remove device    \t,");
+  let deferred = Promise.defer();
+
+  //emulator.run("bt remove-remote " + FAKE_BT_ADDRESS, function(result) {
+    emulator.run("bt remove-remote all", function(result) {
+    if (result.length >= 0) {
+      log("   7. Done    \t,");
+        deferred.resolve();
+    } else {
+      log("   7. Fail?    \t,");
+      deferred.resolve();
+      //deferred.reject();
+    }
+  });
   return deferred.promise;
 }
 
 startBluetoothTest(true, function testCaseMain(aAdapter) {
+  // 0. Enable BT, Add a BT Adapter
+  // 1. Add Device
+  // 2. Set Name
+  // 3. Discovery
+  // 4. Device found
+  // 5. Pair
+  // 6. Stop discover
+  // 7. Remove device
+
   theAdapter = aAdapter;
   aAdapter.ondevicefound = onDeviceFound;
-  //aAdapter.startDiscovery();
-  //aAdapter.stopDiscovery();
 
-  addFakeDevice().then(
-    function() { startDiscovery(aAdapter); },
-    function() { ok(false, "Add fake device failed."); }
-    );
-
-  discoveryDeferred.promise.then(
-    function() {
-      //log("5. Jamin display length: " + aAdapter.devices.length );
-      //log("6. Jamin display devices: " + aAdapter.devices[0].name );
-      //log("7. Jamin display address: " + aAdapter.devices[0].address );
-
-      pair(aAdapter, TheDevice).then(
-        function() { log("5. Pair success"); },
-        function() { log("5. Pair failed"); }
-        );
-
-      stopDiscovery(aAdapter).then(
-        function() { ok(true, "6. Stop discovery success."); },
-        function() { ok(false, "6. Stop discovery failed."); }
-        );
-      }
-    );
+  return removeRemoteDevice()
+    .then(function() { return addRemoteDevice(); })
+    .then(function() { return setRemoteDeviceName(); })
+    .then(function() { return startDiscovery(aAdapter); })
+    .then(function() { return discoveryDeferred.promise; })
+  //.then( Pairing )
+    .then(function() { return stopDiscovery(aAdapter); } )
+    .then(function() { return removeRemoteDevice(); });
 });
